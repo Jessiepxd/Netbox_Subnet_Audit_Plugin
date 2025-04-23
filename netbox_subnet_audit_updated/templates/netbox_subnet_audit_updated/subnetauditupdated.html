@@ -1,0 +1,91 @@
+{% extends 'generic/object.html' %}
+{% load render_table from django_tables2 %}
+
+{% block content %}
+<div class="row mb-3">
+    <div class="col-md-6">
+        <div class="card">
+            <h5 class="card-header">Subnet Audit Details</h5>
+            <div class="card-body">
+                <table class="table table-hover">
+                    <tr>
+                        <th>ID</th>
+                        <td>{{ object.id }}</td>
+                    </tr>
+                    <tr>
+                        <th>Subnet</th>
+                        <td>{{ object.subnet }}</td>
+                    </tr>
+                    <tr>
+                        <th>Status</th>
+                        <td id="audit-status">{{ object.status }}</td>
+                    </tr>
+                    <tr>
+                        <th>Time Created</th>
+                        <td>{{ object.time_created }}</td>
+                    </tr>
+                    <tr>
+                        <th>Created By</th>
+                        <!-- <td>{{ object.created_by.username|default:"Unknown7inhtnml" }}</td> -->
+                        <td>{{ object.created_by.username }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <h5 class="card-header">Audit Records</h5>
+            <div class="card-body table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Record</th>
+                            <th>Timestamp</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for record in audit_records %}
+                            <tr>
+                                <td>{{ record.record }}</td>
+                                <td>{{ record.timestamp }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="2">No audit records available.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function checkAuditStatus() {
+        const statusElement = document.getElementById('audit-status'); // ID for the status field
+        const currentStatus = statusElement ? statusElement.innerText.trim() : null;
+
+        // Stop refreshing if the status is terminal
+        if (currentStatus === 'finished' || currentStatus === 'failed') {
+            console.log(`Audit completed with status: ${currentStatus}`);
+            return; // Exit the function and stop the interval
+        }
+
+        // Refresh the page if not terminal
+        console.log(`Current status: ${currentStatus}, refreshing in 5 seconds...`);
+        setTimeout(() => {
+            location.reload();
+        }, 5000);
+    }
+
+    // Call the function immediately after page load
+    window.onload = checkAuditStatus;
+</script>
+
+
+{% endblock %}
